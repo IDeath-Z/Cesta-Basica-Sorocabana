@@ -1,0 +1,18 @@
+# Run docker compose -f compose.yaml -f compose.prod.yaml up -d to start in production mode.
+services:
+  postgres:
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  api:
+    restart: always
+    # Direct access by IP while there is no domain (no HTTPS yet). The database stays private to the Docker network.
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_FORWARD_HEADERS_STRATEGY=framework
+      - SPRING_FLYWAY_ENABLED=true
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+
+volumes:
+  pgdata:
