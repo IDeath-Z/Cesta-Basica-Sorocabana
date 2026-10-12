@@ -1,4 +1,4 @@
-# Cesta Básica Sorocabana — API
+# API Cesta Básica Sorocabana
 
 > Backend da pesquisa de preços da cesta básica de Sorocaba: cadastro de produtos, marcas e mercados, controle de acesso por permissão e trilha de auditoria.
 
@@ -38,7 +38,6 @@ O repositório usa **GitHub Actions**:
 - **Controle de acesso por permissão**: as permissões são definidas no código e sincronizadas com o banco na inicialização. Funções apenas agrupam permissões, e cada rota exige a permissão correspondente.
 - **Administrador inicial**: criado na primeira inicialização a partir do `.env`, com todas as permissões. A função de administrador não pode ser alterada nem desativada.
 - **Auditoria**: toda alteração grava quem fez, o que mudou e o registro antes e depois, em JSON. Senhas nunca entram no histórico.
-- **Erros padronizados**: toda falha responde no mesmo formato, com mensagens em português.
 
 ---
 
