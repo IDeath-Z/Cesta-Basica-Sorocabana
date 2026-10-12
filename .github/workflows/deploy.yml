@@ -1,0 +1,103 @@
+name: Build, Test & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two deploys at the same time; a newer push waits for the current one.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    # The context test needs a real PostgreSQL.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: cesta_ci
+          POSTGRES_USER: cesta_ci
+          POSTGRES_PASSWORD: cesta_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cesta_ci -d cesta_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/cesta_ci
+      DB_USER: cesta_ci
+      DB_PASSWORD: cesta_ci
+      JWT_SECRET: ci-only-secret
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: "25"
+          distribution: temurin
+          cache: maven
+
+      - name: Build & test
+        run: ./mvnw -B verify
+
+  deploy:
+    name: Deploy to VPS
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      APP_DIR: /opt/cesta-basica
+      SSH_TARGET: ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}
+
+    steps:
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Write .env on the VPS
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        run: |
+          printf '%s\n' "$ENV_FILE" | ssh "$SSH_TARGET" "umask 077 && cat > $APP_DIR/.env"
+
+      - name: Update code and restart containers
+        run: |
+          ssh "$SSH_TARGET" "set -e
+            cd $APP_DIR
+            git fetch --prune origin main
+            git reset --hard origin/main
+            docker compose -f compose.yaml -f compose.prod.yaml up -d --build --remove-orphans
+            docker image prune -f"
+
+      # The login route is public: an empty body answering 400 means the API is up and validating requests.
+      - name: Wait for the API
+        run: |
+          ssh "$SSH_TARGET" 'for i in $(seq 1 30); do
+              code=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8080/api/v1/auth/login -H "Content-Type: application/json" -d "{}" || true)
+              if [ "$code" = "400" ]; then echo "API is up"; exit 0; fi
+              sleep 5
+            done
+            echo "API did not come up in time"
+            docker logs --tail 100 cesta_basica_api
+            exit 1'
