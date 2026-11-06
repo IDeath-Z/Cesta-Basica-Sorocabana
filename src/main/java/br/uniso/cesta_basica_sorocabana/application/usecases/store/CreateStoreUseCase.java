@@ -17,13 +17,13 @@ public final class CreateStoreUseCase {
     private final StoreRepository storeRepository;
     private final AuditRecorder auditRecorder;
 
-    public record Input(UUID requesterId, String name) {}
+    public record Input(UUID requesterId, String name, String storeUrl) {}
 
     public StoreOutput execute(Input input) {
         if (storeRepository.existsByName(input.name()))
             throw new ResourceAlreadyExistsException(StoreApplicationError.NAME_ALREADY_EXISTS.message(input.name()));
 
-        StoreOutput output = StoreOutput.from(storeRepository.save(Store.createNew(input.name())));
+        StoreOutput output = StoreOutput.from(storeRepository.save(Store.createNew(input.name(), input.storeUrl())));
 
         auditRecorder.recordInsert(input.requesterId(), AuditedEntity.STORE, output.id(), output);
         return output;

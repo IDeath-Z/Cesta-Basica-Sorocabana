@@ -96,14 +96,14 @@ public class StoreController {
     public ResponseEntity<StoreResponse> create(@AuthenticationPrincipal SecurityUserDetails userDetails, @RequestBody @Valid CreateStoreRequest request) {
         UUID requesterId = userDetails.getUser().getId();
 
-        var output = transactionalProxy.execute(() -> createStoreUseCase.execute(new CreateStoreUseCase.Input(requesterId, request.name())));
+        var output = transactionalProxy.execute(() -> createStoreUseCase.execute(new CreateStoreUseCase.Input(requesterId, request.name(), request.storeUrl())));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(StoreResponse.from(output));
     }
 
     @PatchMapping("/{id}")
     @RequiresPermission(Permission.UPDATE_STORE)
-    @Operation(summary = "Rename a store", description = "Changes the name of an existing store. Requires permission UPDATE_STORE.")
+    @Operation(summary = "Update a store", description = "Changes the name and/or website of an existing store. Omitted fields keep their value. Requires permission UPDATE_STORE.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Store updated"),
         @ApiResponse(responseCode = "400", description = "Invalid payload"),
@@ -116,7 +116,7 @@ public class StoreController {
             @RequestBody @Valid UpdateStoreRequest request) {
         UUID requesterId = userDetails.getUser().getId();
 
-        var output = transactionalProxy.execute(() -> updateStoreUseCase.execute(new UpdateStoreUseCase.Input(requesterId, id, request.name())));
+        var output = transactionalProxy.execute(() -> updateStoreUseCase.execute(new UpdateStoreUseCase.Input(requesterId, id, request.name(), request.storeUrl())));
 
         return ResponseEntity.ok(StoreResponse.from(output));
     }

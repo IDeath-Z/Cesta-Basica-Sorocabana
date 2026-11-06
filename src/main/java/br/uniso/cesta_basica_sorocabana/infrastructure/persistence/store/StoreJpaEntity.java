@@ -22,6 +22,9 @@ public class StoreJpaEntity {
     @Column(name = "name", nullable = false, unique = true, columnDefinition = "TEXT")
     private String name;
 
+    @Column(name = "store_url", columnDefinition = "TEXT")
+    private String storeUrl;
+
     @Column(name = "active", nullable = false)
     private boolean active;
 }

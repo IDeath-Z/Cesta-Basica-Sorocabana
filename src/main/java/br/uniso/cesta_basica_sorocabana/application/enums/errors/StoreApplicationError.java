@@ -2,6 +2,7 @@ package br.uniso.cesta_basica_sorocabana.application.enums.errors;
 
 public enum StoreApplicationError {
     NOT_FOUND("Mercado %s não encontrado."),
+    INACTIVE("O mercado %s está inativo."),
     NAME_ALREADY_EXISTS("Já existe um mercado com o nome %s.");
 
     private final String template;

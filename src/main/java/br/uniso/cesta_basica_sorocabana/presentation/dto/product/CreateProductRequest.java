@@ -12,7 +12,7 @@ public record CreateProductRequest(
     @NotNull @Schema(description = "ID of an active category", example = "5b2e7c1d-9f4a-4d3b-8e6c-2a1f0b9c8d7e")
     UUID categoryId,
 
-    @Schema(description = "ID of an active sales unit, optional", example = "7a9d4e21-3c5b-4f8a-b6d2-9e1f0a3b5c7d")
+    @NotNull @Schema(description = "ID of an active sales unit", example = "7a9d4e21-3c5b-4f8a-b6d2-9e1f0a3b5c7d")
     UUID unitId,
 
     @NotBlank @Size(max = 120) @Schema(description = "Product name", example = "Arroz")

@@ -14,10 +14,13 @@ public record StoreResponse(
     @Schema(description = "Store name", example = "Tauste")
     String name,
 
+    @Schema(description = "Store website", example = "https://tauste.com.br/sorocaba1")
+    String storeUrl,
+
     @Schema(description = "Whether the store can be used in new records", example = "true")
     boolean active
 ) {
     public static StoreResponse from(StoreOutput output) {
-        return new StoreResponse(output.id(), output.name(), output.active());
+        return new StoreResponse(output.id(), output.name(), output.storeUrl(), output.active());
     }
 }

@@ -11,9 +11,6 @@ public record SurveyTypeResponse(
     @Schema(description = "Unique survey type identifier", example = "c2e8f6a1-4b3d-4e7f-9a0b-5d6c7e8f9a1b")
     UUID id,
 
-    @Schema(description = "Short unique code", example = "WEEKLY")
-    String code,
-
     @Schema(description = "Display name", example = "Semanal")
     String name,
 
@@ -24,6 +21,6 @@ public record SurveyTypeResponse(
     boolean active
 ) {
     public static SurveyTypeResponse from(SurveyTypeOutput output) {
-        return new SurveyTypeResponse(output.id(), output.code(), output.name(), output.description(), output.active());
+        return new SurveyTypeResponse(output.id(), output.name(), output.description(), output.active());
     }
 }

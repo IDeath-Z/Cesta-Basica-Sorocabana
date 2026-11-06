@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import br.uniso.cesta_basica_sorocabana.application.enums.errors.ProductApplicationError;
+import br.uniso.cesta_basica_sorocabana.application.exceptions.BusinessRuleException;
 import br.uniso.cesta_basica_sorocabana.application.exceptions.ResourceAlreadyExistsException;
 import br.uniso.cesta_basica_sorocabana.application.exceptions.ResourceNotFoundException;
 import br.uniso.cesta_basica_sorocabana.application.services.AuditRecorder;
@@ -32,6 +33,8 @@ public final class UpdateProductUseCase {
             referenceValidator.requireActiveUnit(input.unitId());
 
         Product updated = product.update(input.categoryId(), input.unitId(), input.name(), input.specification(), input.notes());
+        if (updated.getUnitId() == null)
+            throw new BusinessRuleException(ProductApplicationError.UNIT_REQUIRED.message());
 
         boolean identityChanged = !updated.getName().equals(product.getName())
             || !Objects.equals(updated.getSpecification(), product.getSpecification());

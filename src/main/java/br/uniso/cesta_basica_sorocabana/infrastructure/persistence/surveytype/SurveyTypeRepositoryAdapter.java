@@ -42,12 +42,7 @@ public final class SurveyTypeRepositoryAdapter implements SurveyTypeRepository {
     }
 
     @Override
-    public Optional<SurveyType> findByCode(String code) {
-        return surveyTypeJpaRepository.findByCode(code).map(surveyTypeMapper::toDomain);
-    }
-
-    @Override
-    public boolean existsByCode(String code) {
-        return surveyTypeJpaRepository.existsByCode(code);
+    public boolean existsByName(String name) {
+        return surveyTypeJpaRepository.existsByName(name);
     }
 }
