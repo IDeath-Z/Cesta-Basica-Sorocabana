@@ -4,7 +4,7 @@
 
 API REST que sustenta a pesquisa de preços da cesta básica em Sorocaba. Ela mantém o cadastro de tudo que entra numa coleta (produtos, marcas, categorias, unidades de venda, mercados e tipos de coleta), controla quem pode alterar cada coisa por meio de permissões e registra cada alteração com o estado anterior e o posterior.
 
-> **Status:** os cadastros, o controle de acesso e a auditoria estão prontos. A coleta de preços (coletas, levantamentos, preços por mercado e cálculo do resultado) já tem modelo de dados e camada de persistência, mas ainda não tem rotas.
+> **Status:** os cadastros, o controle de acesso e a auditoria estão prontos. A coleta de preços já é criada em rascunho e recebe os preços de cada mercado. Faltam o cálculo do resultado e a publicação da coleta.
 
 ---
 
@@ -116,7 +116,7 @@ A documentação completa, com exemplos de requisição e resposta, fica no Swag
 | `GET` | `/stores` | Lista mercados (paginado) | logado |
 | `GET` | `/stores/{id}` | Retorna um mercado | logado |
 | `POST` | `/stores` | Cria um mercado | `CREATE_STORE` |
-| `PATCH` | `/stores/{id}` | Edita um mercado | `UPDATE_STORE` |
+| `PATCH` | `/stores/{id}` | Edita um mercado (nome e site) | `UPDATE_STORE` |
 | `PATCH` | `/stores/{id}/activate` | Reativa um mercado | `UPDATE_STORE` |
 | `PATCH` | `/stores/{id}/deactivate` | Desativa um mercado | `UPDATE_STORE` |
 
@@ -136,7 +136,7 @@ A documentação completa, com exemplos de requisição e resposta, fica no Swag
 | `GET` | `/survey-types` | Lista tipos de coleta (paginado) | logado |
 | `GET` | `/survey-types/{id}` | Retorna um tipo de coleta | logado |
 | `POST` | `/survey-types` | Cria um tipo de coleta | `CREATE_SURVEY_TYPE` |
-| `PATCH` | `/survey-types/{id}` | Edita um tipo de coleta (código, nome e descrição) | `UPDATE_SURVEY_TYPE` |
+| `PATCH` | `/survey-types/{id}` | Edita um tipo de coleta (nome e descrição) | `UPDATE_SURVEY_TYPE` |
 | `PATCH` | `/survey-types/{id}/activate` | Reativa um tipo de coleta | `UPDATE_SURVEY_TYPE` |
 | `PATCH` | `/survey-types/{id}/deactivate` | Desativa um tipo de coleta | `UPDATE_SURVEY_TYPE` |
 
@@ -153,11 +153,37 @@ A documentação completa, com exemplos de requisição e resposta, fica no Swag
 ### Produto + marca
 | Método | Rota | Descrição | Acesso |
 |--------|------|-----------|--------|
+| `GET` | `/product-brands` | Lista todos os vínculos, com nomes de produto e marca (paginado) | logado |
 | `GET` | `/products/{productId}/brands` | Lista as marcas vinculadas ao produto | logado |
 | `POST` | `/products/{productId}/brands` | Vincula uma marca ao produto | `CREATE_PRODUCT_BRAND` |
 | `GET` | `/product-brands/{id}` | Retorna um vínculo | logado |
 | `PATCH` | `/product-brands/{id}/activate` | Reativa um vínculo | `UPDATE_PRODUCT_BRAND` |
 | `PATCH` | `/product-brands/{id}/deactivate` | Desativa um vínculo | `UPDATE_PRODUCT_BRAND` |
+
+### Item da cesta + mercado
+| Método | Rota | Descrição | Acesso |
+|--------|------|-----------|--------|
+| `GET` | `/product-brands/{productBrandId}/stores` | Lista os mercados vinculados ao item | logado |
+| `POST` | `/product-brands/{productBrandId}/stores` | Vincula o item a um mercado, com o nome de pesquisa | `CREATE_PRODUCT_BRAND_STORE` |
+| `GET` | `/product-brand-stores/{id}` | Retorna um vínculo | logado |
+| `PATCH` | `/product-brand-stores/{id}` | Edita o nome de pesquisa | `UPDATE_PRODUCT_BRAND_STORE` |
+| `PATCH` | `/product-brand-stores/{id}/activate` | Reativa um vínculo | `UPDATE_PRODUCT_BRAND_STORE` |
+| `PATCH` | `/product-brand-stores/{id}/deactivate` | Desativa um vínculo | `UPDATE_PRODUCT_BRAND_STORE` |
+
+### Cesta
+| Método | Rota | Descrição | Acesso |
+|--------|------|-----------|--------|
+| `GET` | `/stores/{storeId}/items` | Lista os itens ativos do mercado, com tudo do item | logado |
+
+### Coletas
+| Método | Rota | Descrição | Acesso |
+|--------|------|-----------|--------|
+| `GET` | `/surveys` | Lista as coletas, com os rascunhos (paginado) | logado |
+| `GET` | `/surveys/{id}` | Retorna a coleta, com os mercados e os itens já salvos | logado |
+| `POST` | `/surveys` | Cria a coleta em rascunho | `CREATE_SURVEY` |
+| `PATCH` | `/surveys/{id}` | Edita data, tipo e notas do rascunho | `UPDATE_SURVEY` |
+| `DELETE` | `/surveys/{id}` | Exclui o rascunho e o que foi salvo nele | `DELETE_SURVEY` |
+| `POST` | `/surveys/{id}/prices` | Salva preços de um ou mais mercados. Item não enviado fica como está; `price: null` limpa o item | `REGISTER_SURVEY_ITEM_PRICE` |
 
 ### Auditoria
 | Método | Rota | Descrição | Acesso |
@@ -237,7 +263,7 @@ O override de produção usa um volume persistente para o banco, reinicia os con
 
 O schema é criado pelo Flyway (`src/main/resources/db/migration`). Todas as chaves são UUID.
 
-- **Cadastros**: `product` (categoria, unidade opcional, nome e especificação únicos em conjunto), `brand`, `category`, `unit` (quantidade + grandeza, ex.: 5 kg), `store`, `survey_type` e `product_brand` (o par produto + marca que entra na pesquisa)
+- **Cadastros**: `product` (categoria, unidade obrigatória na API, nome e especificação únicos em conjunto), `brand`, `category`, `unit` (quantidade + grandeza, ex.: 5 kg), `store` (com o site do mercado), `survey_type`, `product_brand` (o par produto + marca que entra na pesquisa) e `product_brand_store` (o item em cada mercado, com o nome de pesquisa)
 - **Coleta**: `survey` (uma coleta por data e tipo), `survey_item` (produto + marca dentro da coleta), `survey_item_price` (preço em cada mercado), `result` e `result_lowest_price` (média, menor e maior preço, diferença e os mercados com o menor preço)
 - **Acesso**: `user`, `role`, `permission` (gerada a partir do código) e `role_permission`
 - **Auditoria**: `audit`, com o autor, a ação, a entidade e os dados antes e depois em JSONB
