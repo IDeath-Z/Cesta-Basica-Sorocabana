@@ -11,4 +11,10 @@ public interface SurveyItemPriceJpaRepository extends JpaRepository<SurveyItemPr
 
     @Query("SELECT sip FROM SurveyItemPriceJpaEntity sip WHERE sip.id.surveyItemId = :surveyItemId")
     List<SurveyItemPriceJpaEntity> findBySurveyItemId(@Param("surveyItemId") UUID surveyItemId);
+
+    @Query("""
+        select price from SurveyItemPriceJpaEntity price
+        where price.id.surveyItemId in (select surveyItem.id from SurveyItemJpaEntity surveyItem where surveyItem.survey.id = :surveyId)
+        """)
+    List<SurveyItemPriceJpaEntity> findBySurveyId(@Param("surveyId") UUID surveyId);
 }

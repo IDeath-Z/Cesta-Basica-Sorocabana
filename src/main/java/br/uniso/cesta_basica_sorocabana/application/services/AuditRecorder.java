@@ -26,4 +26,8 @@ public final class AuditRecorder {
         auditRepository.save(Audit.createNew(requesterId, AuditAction.UPDATE, entity, entityId,
             dataSerializer.toJson(before), dataSerializer.toJson(after)));
     }
+
+    public void recordDelete(UUID requesterId, AuditedEntity entity, UUID entityId, Object before) {
+        auditRepository.save(Audit.createNew(requesterId, AuditAction.DELETE, entity, entityId, dataSerializer.toJson(before), null));
+    }
 }
