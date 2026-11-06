@@ -19,10 +19,7 @@ public class SurveyTypeJpaEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @Column(name = "code", nullable = false, unique = true, columnDefinition = "TEXT")
-    private String code;
-
-    @Column(name = "name", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "name", nullable = false, unique = true, columnDefinition = "TEXT")
     private String name;
 
     @Column(name = "description", columnDefinition = "TEXT")

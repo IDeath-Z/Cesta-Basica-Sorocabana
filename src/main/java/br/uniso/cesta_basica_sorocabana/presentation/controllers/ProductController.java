@@ -88,7 +88,7 @@ public class ProductController {
 
     @PostMapping
     @RequiresPermission(Permission.CREATE_PRODUCT)
-    @Operation(summary = "Create a product", description = "Registers a new active product. The category and the unit (when given) must exist and be active. Requires permission CREATE_PRODUCT.")
+    @Operation(summary = "Create a product", description = "Registers a new active product. The category and the unit must exist and be active. Requires permission CREATE_PRODUCT.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Product created"),
         @ApiResponse(responseCode = "400", description = "Invalid payload, or the category or unit is inactive"),
@@ -112,7 +112,7 @@ public class ProductController {
 
     @PatchMapping("/{id}")
     @RequiresPermission(Permission.UPDATE_PRODUCT)
-    @Operation(summary = "Update a product", description = "Changes the fields of an existing product. Omitted fields keep their value; a new category or unit must exist and be active. Requires permission UPDATE_PRODUCT.")
+    @Operation(summary = "Update a product", description = "Changes the fields of an existing product. Omitted fields keep their value; a new category or unit must exist and be active, and the product must end up with a unit. Requires permission UPDATE_PRODUCT.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Product updated"),
         @ApiResponse(responseCode = "400", description = "Invalid payload, or the new category or unit is inactive"),

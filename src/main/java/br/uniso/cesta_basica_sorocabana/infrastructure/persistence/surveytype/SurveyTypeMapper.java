@@ -10,7 +10,6 @@ public final class SurveyTypeMapper {
     public SurveyTypeJpaEntity toJpa(SurveyType surveyType) {
         SurveyTypeJpaEntity entity = new SurveyTypeJpaEntity();
         entity.setId(surveyType.getId());
-        entity.setCode(surveyType.getCode());
         entity.setName(surveyType.getName());
         entity.setDescription(surveyType.getDescription());
         entity.setActive(surveyType.isActive());
@@ -20,7 +19,6 @@ public final class SurveyTypeMapper {
     public SurveyType toDomain(SurveyTypeJpaEntity entity) {
         return SurveyType.restore(
             entity.getId(),
-            entity.getCode(),
             entity.getName(),
             entity.getDescription(),
             entity.isActive()

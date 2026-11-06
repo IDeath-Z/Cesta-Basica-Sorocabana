@@ -17,13 +17,13 @@ public final class CreateSurveyTypeUseCase {
     private final SurveyTypeRepository surveyTypeRepository;
     private final AuditRecorder auditRecorder;
 
-    public record Input(UUID requesterId, String code, String name, String description) {}
+    public record Input(UUID requesterId, String name, String description) {}
 
     public SurveyTypeOutput execute(Input input) {
-        if (surveyTypeRepository.existsByCode(input.code()))
-            throw new ResourceAlreadyExistsException(SurveyTypeApplicationError.CODE_ALREADY_EXISTS.message(input.code()));
+        if (surveyTypeRepository.existsByName(input.name()))
+            throw new ResourceAlreadyExistsException(SurveyTypeApplicationError.NAME_ALREADY_EXISTS.message(input.name()));
 
-        SurveyType surveyType = surveyTypeRepository.save(SurveyType.createNew(input.code(), input.name(), input.description()));
+        SurveyType surveyType = surveyTypeRepository.save(SurveyType.createNew(input.name(), input.description()));
         SurveyTypeOutput output = SurveyTypeOutput.from(surveyType);
 
         auditRecorder.recordInsert(input.requesterId(), AuditedEntity.SURVEY_TYPE, output.id(), output);

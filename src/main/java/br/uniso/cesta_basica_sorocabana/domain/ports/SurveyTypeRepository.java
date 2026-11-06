@@ -12,6 +12,5 @@ public interface SurveyTypeRepository {
     SurveyType save(SurveyType surveyType);
     Optional<SurveyType> findById(UUID id);
     DomainPageResult<SurveyType> findAll(DomainPageRequest pageRequest);
-    Optional<SurveyType> findByCode(String code);
-    boolean existsByCode(String code);
+    boolean existsByName(String name);
 }

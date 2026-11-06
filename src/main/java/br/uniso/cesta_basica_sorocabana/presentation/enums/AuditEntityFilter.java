@@ -16,7 +16,10 @@ public enum AuditEntityFilter {
     UNIT,
     SURVEY_TYPE,
     PRODUCT,
-    PRODUCT_BRAND;
+    PRODUCT_BRAND,
+    PRODUCT_BRAND_STORE,
+    SURVEY,
+    SURVEY_ITEM;
 
     // Fails at startup if a new AuditedEntity was added without its filter here.
     static {

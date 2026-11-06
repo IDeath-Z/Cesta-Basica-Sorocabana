@@ -11,6 +11,7 @@ public interface SurveyItemPriceRepository {
     SurveyItemPrice save(SurveyItemPrice surveyItemPrice);
     Optional<SurveyItemPrice> findById(UUID surveyItemId, UUID storeId);
     List<SurveyItemPrice> findBySurveyItemId(UUID surveyItemId);
+    List<SurveyItemPrice> findBySurveyId(UUID surveyId);
     boolean existsById(UUID surveyItemId, UUID storeId);
     void deleteById(UUID surveyItemId, UUID storeId);
 }

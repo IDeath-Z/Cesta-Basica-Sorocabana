@@ -22,8 +22,7 @@ public final class CreateProductUseCase {
 
     public ProductOutput execute(Input input) {
         referenceValidator.requireActiveCategory(input.categoryId());
-        if (input.unitId() != null)
-            referenceValidator.requireActiveUnit(input.unitId());
+        referenceValidator.requireActiveUnit(input.unitId());
 
         if (productRepository.existsByNameAndSpecification(input.name(), input.specification()))
             throw new ResourceAlreadyExistsException(ProductApplicationError.ALREADY_EXISTS.message(input.name()));

@@ -39,6 +39,14 @@ public final class SurveyItemPriceRepositoryAdapter implements SurveyItemPriceRe
     }
 
     @Override
+    public List<SurveyItemPrice> findBySurveyId(UUID surveyId) {
+        return surveyItemPriceJpaRepository.findBySurveyId(surveyId)
+            .stream()
+            .map(surveyItemPriceMapper::toDomain)
+            .toList();
+    }
+
+    @Override
     public boolean existsById(UUID surveyItemId, UUID storeId) {
         return surveyItemPriceJpaRepository.existsById(new SurveyItemPriceJpaId(surveyItemId, storeId));
     }

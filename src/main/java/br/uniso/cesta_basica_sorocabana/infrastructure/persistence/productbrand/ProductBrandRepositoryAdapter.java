@@ -4,14 +4,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import br.uniso.cesta_basica_sorocabana.domain.entities.ProductBrand;
 import br.uniso.cesta_basica_sorocabana.domain.ports.ProductBrandRepository;
+import br.uniso.cesta_basica_sorocabana.domain.shared.DomainPageResult;
+import br.uniso.cesta_basica_sorocabana.domain.shared.ProductBrandSummary;
 import br.uniso.cesta_basica_sorocabana.infrastructure.persistence.brand.BrandJpaEntity;
 import br.uniso.cesta_basica_sorocabana.infrastructure.persistence.brand.BrandJpaRepository;
 import br.uniso.cesta_basica_sorocabana.infrastructure.persistence.product.ProductJpaEntity;
 import br.uniso.cesta_basica_sorocabana.infrastructure.persistence.product.ProductJpaRepository;
+import br.uniso.cesta_basica_sorocabana.infrastructure.persistence.shared.PageConverter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,6 +48,11 @@ public final class ProductBrandRepositoryAdapter implements ProductBrandReposito
             .stream()
             .map(productBrandMapper::toDomain)
             .toList();
+    }
+
+    @Override
+    public DomainPageResult<ProductBrandSummary> findAllSummaries(int page, int size) {
+        return PageConverter.toDomain(productBrandJpaRepository.findAllSummaries(PageRequest.of(page, size)), summary -> summary);
     }
 
     @Override

@@ -18,17 +18,17 @@ public final class UpdateStoreUseCase {
     private final StoreRepository storeRepository;
     private final AuditRecorder auditRecorder;
 
-    public record Input(UUID requesterId, UUID id, String name) {}
+    public record Input(UUID requesterId, UUID id, String name, String storeUrl) {}
 
     public StoreOutput execute(Input input) {
         Store store = storeRepository.findById(input.id())
             .orElseThrow(() -> new ResourceNotFoundException(StoreApplicationError.NOT_FOUND.message(input.id())));
 
-        if (!store.getName().equals(input.name()) && storeRepository.existsByName(input.name()))
+        if (input.name() != null && !store.getName().equals(input.name()) && storeRepository.existsByName(input.name()))
             throw new ResourceAlreadyExistsException(StoreApplicationError.NAME_ALREADY_EXISTS.message(input.name()));
 
         StoreOutput before = StoreOutput.from(store);
-        StoreOutput after = StoreOutput.from(storeRepository.save(store.rename(input.name())));
+        StoreOutput after = StoreOutput.from(storeRepository.save(store.update(input.name(), input.storeUrl())));
 
         auditRecorder.recordUpdate(input.requesterId(), AuditedEntity.STORE, after.id(), before, after);
         return after;

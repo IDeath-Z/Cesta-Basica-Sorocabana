@@ -11,6 +11,7 @@ public final class StoreMapper {
         StoreJpaEntity entity = new StoreJpaEntity();
         entity.setId(store.getId());
         entity.setName(store.getName());
+        entity.setStoreUrl(store.getStoreUrl());
         entity.setActive(store.isActive());
         return entity;
     }
@@ -19,6 +20,7 @@ public final class StoreMapper {
         return Store.restore(
             entity.getId(),
             entity.getName(),
+            entity.getStoreUrl(),
             entity.isActive()
         );
     }

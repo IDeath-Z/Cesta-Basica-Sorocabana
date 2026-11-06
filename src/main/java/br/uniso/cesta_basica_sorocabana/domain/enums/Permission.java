@@ -28,6 +28,9 @@ public enum Permission {
     CREATE_PRODUCT_BRAND("Vincular marca a produto"),
     UPDATE_PRODUCT_BRAND("Ativar e desativar vínculo de marca com produto"),
 
+    CREATE_PRODUCT_BRAND_STORE("Vincular item da cesta a mercado"),
+    UPDATE_PRODUCT_BRAND_STORE("Editar, ativar e desativar vínculo de item da cesta com mercado"),
+
     CREATE_SURVEY("Cadastrar coleta"),
     UPDATE_SURVEY("Editar coleta"),
     DELETE_SURVEY("Excluir coleta"),

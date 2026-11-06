@@ -91,24 +91,24 @@ public class SurveyTypeController {
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Survey type created"),
         @ApiResponse(responseCode = "400", description = "Invalid payload"),
-        @ApiResponse(responseCode = "409", description = "A survey type with this code already exists")
+        @ApiResponse(responseCode = "409", description = "A survey type with this name already exists")
     })
     public ResponseEntity<SurveyTypeResponse> create(@AuthenticationPrincipal SecurityUserDetails userDetails, @RequestBody @Valid CreateSurveyTypeRequest request) {
         UUID requesterId = userDetails.getUser().getId();
 
-        var output = transactionalProxy.execute(() -> createSurveyTypeUseCase.execute(new CreateSurveyTypeUseCase.Input(requesterId, request.code(), request.name(), request.description())));
+        var output = transactionalProxy.execute(() -> createSurveyTypeUseCase.execute(new CreateSurveyTypeUseCase.Input(requesterId, request.name(), request.description())));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(SurveyTypeResponse.from(output));
     }
 
     @PatchMapping("/{id}")
     @RequiresPermission(Permission.UPDATE_SURVEY_TYPE)
-    @Operation(summary = "Update a survey type", description = "Changes the code, name and/or description of an existing survey type. Omitted fields keep their value. Requires permission UPDATE_SURVEY_TYPE.")
+    @Operation(summary = "Update a survey type", description = "Changes the name and/or description of an existing survey type. Omitted fields keep their value. Requires permission UPDATE_SURVEY_TYPE.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Survey type updated"),
         @ApiResponse(responseCode = "400", description = "Invalid payload"),
         @ApiResponse(responseCode = "404", description = "Survey type not found"),
-        @ApiResponse(responseCode = "409", description = "Another survey type already has this code")
+        @ApiResponse(responseCode = "409", description = "Another survey type already has this name")
     })
     public ResponseEntity<SurveyTypeResponse> update(
             @AuthenticationPrincipal SecurityUserDetails userDetails,
@@ -116,7 +116,7 @@ public class SurveyTypeController {
             @RequestBody @Valid UpdateSurveyTypeRequest request) {
         UUID requesterId = userDetails.getUser().getId();
 
-        var output = transactionalProxy.execute(() -> updateSurveyTypeUseCase.execute(new UpdateSurveyTypeUseCase.Input(requesterId, id, request.code(), request.name(), request.description())));
+        var output = transactionalProxy.execute(() -> updateSurveyTypeUseCase.execute(new UpdateSurveyTypeUseCase.Input(requesterId, id, request.name(), request.description())));
 
         return ResponseEntity.ok(SurveyTypeResponse.from(output));
     }

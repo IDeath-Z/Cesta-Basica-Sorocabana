@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.UpdateProductBrandStatusUseCase;
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.CreateProductBrandUseCase;
+import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.FetchAllProductBrandsUseCase;
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.FetchProductBrandUseCase;
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.FetchProductBrandsUseCase;
 import br.uniso.cesta_basica_sorocabana.domain.enums.Permission;
@@ -23,6 +25,8 @@ import br.uniso.cesta_basica_sorocabana.infrastructure.security.RequiresPermissi
 import br.uniso.cesta_basica_sorocabana.infrastructure.security.SecurityUserDetails;
 import br.uniso.cesta_basica_sorocabana.presentation.dto.productbrand.CreateProductBrandRequest;
 import br.uniso.cesta_basica_sorocabana.presentation.dto.productbrand.ProductBrandResponse;
+import br.uniso.cesta_basica_sorocabana.presentation.dto.productbrand.ProductBrandSummaryResponse;
+import br.uniso.cesta_basica_sorocabana.presentation.dto.shared.PageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,6 +34,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -38,10 +44,28 @@ import lombok.RequiredArgsConstructor;
 public class ProductBrandController {
 
     private final CreateProductBrandUseCase createProductBrandUseCase;
+    private final FetchAllProductBrandsUseCase fetchAllProductBrandsUseCase;
     private final FetchProductBrandUseCase fetchProductBrandUseCase;
     private final FetchProductBrandsUseCase fetchProductBrandsUseCase;
     private final UpdateProductBrandStatusUseCase updateProductBrandStatusUseCase;
     private final TransactionalProxy transactionalProxy;
+
+    @GetMapping("/product-brands")
+    @Operation(summary = "List all product brands", description = "Returns a page of every product + brand pair, active and inactive, with product and brand names, ordered by product and brand.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Page of product brands"),
+        @ApiResponse(responseCode = "400", description = "Invalid page or size")
+    })
+    public ResponseEntity<PageResponse<ProductBrandSummaryResponse>> list(
+            @Parameter(description = "Page number, starting at 0", example = "0") @RequestParam(defaultValue = "0") @Min(0) int page,
+            @Parameter(description = "Items per page, from 1 to 100", example = "20") @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
+
+        var output = transactionalProxy.executeReadOnly(() -> fetchAllProductBrandsUseCase.execute(
+            new FetchAllProductBrandsUseCase.Input(page, size)
+        ));
+
+        return ResponseEntity.ok(PageResponse.from(output, ProductBrandSummaryResponse::from));
+    }
 
     @GetMapping("/products/{productId}/brands")
     @Operation(summary = "List the brands of a product", description = "Returns every brand linked to the product, active and inactive.")

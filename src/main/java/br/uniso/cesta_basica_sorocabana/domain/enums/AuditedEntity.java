@@ -11,5 +11,8 @@ public enum AuditedEntity {
     UNIT,
     SURVEY_TYPE,
     PRODUCT,
-    PRODUCT_BRAND
+    PRODUCT_BRAND,
+    PRODUCT_BRAND_STORE,
+    SURVEY,
+    SURVEY_ITEM
 }

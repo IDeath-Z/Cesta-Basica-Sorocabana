@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import br.uniso.cesta_basica_sorocabana.application.services.AuditRecorder;
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.UpdateProductBrandStatusUseCase;
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.CreateProductBrandUseCase;
+import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.FetchAllProductBrandsUseCase;
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.FetchProductBrandUseCase;
 import br.uniso.cesta_basica_sorocabana.application.usecases.productbrand.FetchProductBrandsUseCase;
 import br.uniso.cesta_basica_sorocabana.domain.ports.BrandRepository;
@@ -18,6 +19,11 @@ public class ProductBrandConfig {
     @Bean
     public CreateProductBrandUseCase createProductBrandUseCase(ProductBrandRepository productBrandRepository, ProductRepository productRepository, BrandRepository brandRepository, AuditRecorder auditRecorder) {
         return new CreateProductBrandUseCase(productBrandRepository, productRepository, brandRepository, auditRecorder);
+    }
+
+    @Bean
+    public FetchAllProductBrandsUseCase fetchAllProductBrandsUseCase(ProductBrandRepository productBrandRepository) {
+        return new FetchAllProductBrandsUseCase(productBrandRepository);
     }
 
     @Bean

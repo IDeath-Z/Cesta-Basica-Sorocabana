@@ -18,16 +18,16 @@ public final class UpdateSurveyTypeUseCase {
     private final SurveyTypeRepository surveyTypeRepository;
     private final AuditRecorder auditRecorder;
 
-    public record Input(UUID requesterId, UUID id, String code, String name, String description) {}
+    public record Input(UUID requesterId, UUID id, String name, String description) {}
 
     public SurveyTypeOutput execute(Input input) {
         SurveyType surveyType = surveyTypeRepository.findById(input.id())
             .orElseThrow(() -> new ResourceNotFoundException(SurveyTypeApplicationError.NOT_FOUND.message(input.id())));
 
-        if (input.code() != null && !input.code().equals(surveyType.getCode()) && surveyTypeRepository.existsByCode(input.code()))
-            throw new ResourceAlreadyExistsException(SurveyTypeApplicationError.CODE_ALREADY_EXISTS.message(input.code()));
+        if (input.name() != null && !input.name().equals(surveyType.getName()) && surveyTypeRepository.existsByName(input.name()))
+            throw new ResourceAlreadyExistsException(SurveyTypeApplicationError.NAME_ALREADY_EXISTS.message(input.name()));
 
-        SurveyType updated = surveyType.update(input.code(), input.name(), input.description());
+        SurveyType updated = surveyType.update(input.name(), input.description());
         SurveyTypeOutput before = SurveyTypeOutput.from(surveyType);
         SurveyTypeOutput after = SurveyTypeOutput.from(surveyTypeRepository.save(updated));
 
