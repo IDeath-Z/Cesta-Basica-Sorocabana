@@ -27,7 +27,7 @@ public interface BasketJpaRepository extends Repository<ProductBrandStoreJpaEnti
         left join product.unit unit
         join productBrand.brand brand
         join link.store store
-        where store.id = :storeId
+        where store.id = :storeId and link.searchName is not null
           and link.active = true and productBrand.active = true and product.active = true
           and brand.active = true and store.active = true
         order by product.name, product.specification, brand.name

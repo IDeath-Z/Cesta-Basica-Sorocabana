@@ -34,7 +34,7 @@ public class ProductBrandStoreJpaEntity {
     @JoinColumn(name = "store_id", nullable = false, foreignKey = @ForeignKey(name = "fk_pbs_store"))
     private StoreJpaEntity store;
 
-    @Column(name = "search_name", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "search_name", columnDefinition = "TEXT")
     private String searchName;
 
     @Column(name = "active", nullable = false)
