@@ -4,7 +4,7 @@ public enum ProductBrandStoreError {
     ID_REQUIRED("O ID do vínculo do item com o mercado é obrigatório."),
     PRODUCT_BRAND_ID_REQUIRED("O ID do produto + marca é obrigatório."),
     STORE_ID_REQUIRED("O ID do mercado é obrigatório."),
-    SEARCH_NAME_REQUIRED("O nome de pesquisa é obrigatório.");
+    SEARCH_NAME_BLANK("O nome de pesquisa não pode ser vazio. Use nulo quando o mercado não tem o item.");
 
     private final String template;
 

@@ -17,8 +17,16 @@ public final class ProductBrandStore {
         this.id = DomainValidator.requireNonNull(id, ProductBrandStoreError.ID_REQUIRED.message());
         this.productBrandId = DomainValidator.requireNonNull(productBrandId, ProductBrandStoreError.PRODUCT_BRAND_ID_REQUIRED.message());
         this.storeId = DomainValidator.requireNonNull(storeId, ProductBrandStoreError.STORE_ID_REQUIRED.message());
-        this.searchName = DomainValidator.requireNonBlank(searchName, ProductBrandStoreError.SEARCH_NAME_REQUIRED.message());
+        this.searchName = normalizeSearchName(searchName);
         this.active = active;
+    }
+
+    // Null means the store does not carry the item. A blank text is a mistake, not a null.
+    private static String normalizeSearchName(String searchName) {
+        if (searchName == null)
+            return null;
+
+        return DomainValidator.requireNonBlank(searchName, ProductBrandStoreError.SEARCH_NAME_BLANK.message()).strip();
     }
 
     public static ProductBrandStore createNew(UUID productBrandId, UUID storeId, String searchName) {

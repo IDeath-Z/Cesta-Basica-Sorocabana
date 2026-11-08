@@ -15,17 +15,17 @@ CREATE TABLE product_brand_store (
     id                uuid    NOT NULL,
     product_brand_id  uuid    NOT NULL,
     store_id          uuid    NOT NULL,
-    search_name       text    NOT NULL,
+    search_name       text,
     active            boolean NOT NULL DEFAULT true,
 
     CONSTRAINT pk_product_brand_store   PRIMARY KEY (id),
     CONSTRAINT uq_pbs_product_brand_store UNIQUE (product_brand_id, store_id),
     CONSTRAINT fk_pbs_product_brand     FOREIGN KEY (product_brand_id) REFERENCES product_brand (id),
     CONSTRAINT fk_pbs_store             FOREIGN KEY (store_id)         REFERENCES store (id),
-    CONSTRAINT ck_pbs_search_name       CHECK (length(btrim(search_name)) > 0)
+    CONSTRAINT ck_pbs_search_name       CHECK (search_name IS NULL OR length(btrim(search_name)) > 0)
 );
 
 CREATE INDEX ix_pbs_store ON product_brand_store (store_id);
 
 COMMENT ON TABLE  product_brand_store             IS 'Item da cesta em um mercado. Sem vínculo, o item não é pesquisado nesse mercado';
-COMMENT ON COLUMN product_brand_store.search_name IS 'Como este mercado chama o item, já com a marca. Ex: Arroz Camil tipo 1 5kg';
+COMMENT ON COLUMN product_brand_store.search_name IS 'Como este mercado chama o item, já com a marca. Ex: Arroz Camil tipo 1 5kg. Nulo = o mercado não tem o item (a pessoa confirma "não possui") e ele não é pesquisado lá';
